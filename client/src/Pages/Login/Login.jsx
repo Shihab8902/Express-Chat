@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { FaRegEye } from "react-icons/fa";
 import { MdOutlineEmail } from "react-icons/md";
 import { FaRegEyeSlash } from "react-icons/fa";
@@ -9,6 +9,7 @@ import { useContext, useState } from "react";
 import { UserContext } from "../../Context/AuthProvider";
 import toast, { Toaster } from 'react-hot-toast';
 import Swal from "sweetalert2";
+import { RotatingLines } from "react-loader-spinner";
 
 
 const Login = () => {
@@ -16,7 +17,9 @@ const Login = () => {
     const navigate = useNavigate();
 
 
+    //States
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isLogging, setIsLogging] = useState(false);
 
     const { loginUser } = useContext(UserContext);
 
@@ -24,20 +27,25 @@ const Login = () => {
     const { register, handleSubmit, formState: { errors }, } = useForm();
 
     const onSubmit = (data) => {
+        setIsLogging(true);
         loginUser(data?.email, data?.password)
             .then(response => {
                 const user = response?.user;
                 if (!user?.emailVerified) {
+                    setIsLogging(false);
                     return toast.error("Please verify your email before login!");
                 }
                 if (user) {
+                    setIsLogging(false);
                     navigate("/");
                 }
             })
             .catch(error => {
                 if (error?.message === "Firebase: Error (auth/invalid-credential).") {
+                    setIsLogging(false);
                     return toast.error("Invalid user credentials!");
                 }
+                setIsLogging(false);
                 toast.error(error?.message);
             });
 
@@ -115,7 +123,22 @@ const Login = () => {
 
 
                 <div className="mt-5">
-                    <button className="w-full bg-green-700 hover:bg-green-600 text-white  font-bold uppercase shadow-buttonShadow py-3 rounded-full">Login</button>
+                    <button disabled={isLogging} className="w-full bg-green-700 hover:bg-green-600 text-white  font-bold uppercase shadow-buttonShadow py-3 rounded-full">
+                        {isLogging ? <div className="flex gap-2 items-center justify-center">
+                            <span>Login</span>
+                            <RotatingLines
+                                visible={true}
+                                height="20"
+                                width="20"
+                                strokeWidth="5"
+                                strokeColor="white"
+                                animationDuration="0.75"
+                                ariaLabel="rotating-lines-loading"
+                                wrapperStyle={{}}
+                            />
+                        </div>
+                            : "Login"}
+                    </button>
                 </div>
             </form>
             <p className="text-center font-medium text-gray-500  mt-5">Don't have an account? <Link className="text-gray-600 hover:text-black hover:underline" to="/register">Register</Link></p>

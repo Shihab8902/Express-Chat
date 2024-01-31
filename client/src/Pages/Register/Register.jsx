@@ -10,6 +10,7 @@ import { UserContext } from "../../Context/AuthProvider";
 import { sendEmailVerification, updateProfile } from "firebase/auth";
 import toast, { Toaster } from 'react-hot-toast';
 import Swal from "sweetalert2";
+import { RotatingLines } from 'react-loader-spinner';
 
 
 
@@ -20,6 +21,7 @@ const Register = () => {
 
     //States
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isRegistering, setIsRegistering] = useState(false);
 
     const { createUser } = useContext(UserContext);
 
@@ -28,6 +30,7 @@ const Register = () => {
     const { register, handleSubmit, formState: { errors }, } = useForm();
 
     const onSubmit = (data) => {
+        setIsRegistering(true);
 
         createUser(data?.email, data?.password)
             .then(response => {
@@ -37,6 +40,7 @@ const Register = () => {
                         .then(() => {
                             updateProfile(user, { displayName: data?.name || " ", photoURL: userPlaceholder })
                                 .then(() => {
+                                    setIsRegistering(false);
                                     Swal.fire({
                                         title: " Verify Your Email!",
                                         text: " A verification email has been sent to your email address. Please check your inbox and click on the verification link to complete the registration process.",
@@ -52,6 +56,7 @@ const Register = () => {
             })
             .catch(error => {
                 toast.error(error?.message);
+                setIsRegistering(false);
             })
     }
 
@@ -104,7 +109,22 @@ const Register = () => {
 
 
                 <div className="mt-5">
-                    <button className="w-full bg-green-700 hover:bg-green-600 text-white  font-bold uppercase shadow-buttonShadow py-3 rounded-full">Register</button>
+                    <button disabled={isRegistering} className="w-full bg-green-700 hover:bg-green-600 text-white  font-bold uppercase shadow-buttonShadow py-3 rounded-full">
+                        {isRegistering ? <div className="flex gap-2 items-center justify-center">
+                            <span>Register</span>
+                            <RotatingLines
+                                visible={true}
+                                height="20"
+                                width="20"
+                                strokeWidth="5"
+                                strokeColor="white"
+                                animationDuration="0.75"
+                                ariaLabel="rotating-lines-loading"
+                                wrapperStyle={{}}
+                            />
+                        </div>
+                            : "Register"}
+                    </button>
                 </div>
             </form>
             <p className="text-center font-medium text-gray-500  mt-5">Already have an account? <Link className="text-gray-600 hover:text-black hover:underline" to="/login">Login</Link></p>
