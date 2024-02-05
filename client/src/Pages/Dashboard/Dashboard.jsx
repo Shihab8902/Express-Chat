@@ -10,8 +10,6 @@ const DashBoard = () => {
 
 
     //TODO: 
-    //2. Implement JWT
-    //3. Save user to database
     //4. Add forget password link to login page
 
 

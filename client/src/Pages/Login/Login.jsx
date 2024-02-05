@@ -1,4 +1,4 @@
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { FaRegEye } from "react-icons/fa";
 import { MdOutlineEmail } from "react-icons/md";
 import { FaRegEyeSlash } from "react-icons/fa";
@@ -10,11 +10,13 @@ import { UserContext } from "../../Context/AuthProvider";
 import toast, { Toaster } from 'react-hot-toast';
 import Swal from "sweetalert2";
 import { RotatingLines } from "react-loader-spinner";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
 
 
 const Login = () => {
 
     const navigate = useNavigate();
+    const axiosPublic = useAxiosPublic();
 
 
     //States
@@ -36,8 +38,14 @@ const Login = () => {
                     return toast.error("Please verify your email before login!");
                 }
                 if (user) {
-                    setIsLogging(false);
-                    navigate("/");
+                    //Save verified user to Database
+                    axiosPublic.post("/user", { name: user?.displayName, email: user?.email })
+                        .then(res => {
+                            if (res.data) {
+                                setIsLogging(false);
+                                navigate("/");
+                            }
+                        })
                 }
             })
             .catch(error => {
@@ -74,6 +82,9 @@ const Login = () => {
                             icon: "error"
                         })
                     }
+
+                    //Check for email exist
+
 
 
 

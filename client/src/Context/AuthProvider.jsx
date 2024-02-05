@@ -2,11 +2,14 @@ import { createContext, useEffect, useState } from "react";
 import PropTypes from 'prop-types';
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import auth from '../Firebase/firebase.config';
+import useAxiosPublic from "../hooks/useAxiosPublic";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 
 export const UserContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
+
 
     //States
     const [user, setUser] = useState(null);
@@ -31,8 +34,16 @@ const AuthProvider = ({ children }) => {
     //Logout user
     const logOutUser = () => {
         setLoading(true);
+        localStorage.removeItem("refresh-token");
+        localStorage.removeItem("session-token");
+        localStorage.removeItem("expiresAt");
         return signOut(auth)
     }
+
+
+    //Axios
+    const axiosPublic = useAxiosPublic();
+    const axiosSecure = useAxiosSecure();
 
 
     //User state observer
@@ -40,8 +51,18 @@ const AuthProvider = ({ children }) => {
         const unsubscribe = onAuthStateChanged(auth, currentUser => {
 
             if (currentUser && currentUser?.emailVerified) {
-                setUser(currentUser);
-                setLoading(false);
+                axiosPublic.post("/jwt", { user: currentUser?.email })
+                    .then(res => {
+                        if (res?.status === 200) {
+                            const data = res.data;
+                            localStorage.setItem("refresh-token", data?.refreshToken);
+                            localStorage.setItem("session-token", data?.sessionToken);
+                            localStorage.setItem("expiresAt", JSON.stringify(data?.expiresAt));
+                            setUser(currentUser);
+                            setLoading(false);
+                        }
+                    });
+
             } else {
                 setUser(null);
                 setLoading(true);
@@ -51,10 +72,31 @@ const AuthProvider = ({ children }) => {
 
 
         return () => {
-            unsubscribe()
+            unsubscribe();
         };
 
     }, []);
+
+
+    //Refresh token
+    useEffect(() => {
+        const refreshToken = localStorage.getItem("refresh-token");
+        const expiresAt = JSON.parse(localStorage.getItem("expiresAt"));
+
+        if (user) {
+            const refreshInterval = setInterval(() => {
+                axiosSecure.post("/refreshToken", { token: refreshToken })
+                    .then(res => {
+                        localStorage.setItem("session-token", res.data?.token)
+                    });
+            }, expiresAt * 1000 - 500 * 1000); //Refresh the token every approx 21 minute
+
+
+
+            return () => clearInterval(refreshInterval); //Clear interval after unmount
+        }
+
+    })
 
 
     const authInfo = {
@@ -64,7 +106,6 @@ const AuthProvider = ({ children }) => {
         loginUser,
         logOutUser
     }
-
 
 
 
