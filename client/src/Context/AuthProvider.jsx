@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import PropTypes from 'prop-types';
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import auth from '../Firebase/firebase.config';
 import useAxiosPublic from "../hooks/useAxiosPublic";
 import useAxiosSecure from "../hooks/useAxiosSecure";
@@ -38,6 +38,13 @@ const AuthProvider = ({ children }) => {
         localStorage.removeItem("session-token");
         localStorage.removeItem("expiresAt");
         return signOut(auth)
+    }
+
+
+    //Send password reset email
+    const resetUserPassword = (email) => {
+        setLoading(true);
+        return sendPasswordResetEmail(auth, email)
     }
 
 
@@ -104,7 +111,8 @@ const AuthProvider = ({ children }) => {
         loading,
         createUser,
         loginUser,
-        logOutUser
+        logOutUser,
+        resetUserPassword
     }
 
 

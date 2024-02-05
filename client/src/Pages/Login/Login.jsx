@@ -23,7 +23,7 @@ const Login = () => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isLogging, setIsLogging] = useState(false);
 
-    const { loginUser } = useContext(UserContext);
+    const { loginUser, resetUserPassword } = useContext(UserContext);
 
     //Form submit
     const { register, handleSubmit, formState: { errors }, } = useForm();
@@ -37,16 +37,10 @@ const Login = () => {
                     setIsLogging(false);
                     return toast.error("Please verify your email before login!");
                 }
-                if (user) {
-                    //Save verified user to Database
-                    axiosPublic.post("/user", { name: user?.displayName, email: user?.email })
-                        .then(res => {
-                            if (res.data) {
-                                setIsLogging(false);
-                                navigate("/");
-                            }
-                        })
-                }
+
+                setIsLogging(false);
+                navigate("/");
+
             })
             .catch(error => {
                 if (error?.message === "Firebase: Error (auth/invalid-credential).") {
@@ -84,7 +78,25 @@ const Login = () => {
                     }
 
                     //Check for email exist
+                    axiosPublic.get(`/user/exist?email=${value}`)
+                        .then(res => {
+                            if (!res.data) {
+                                return Swal.fire({
+                                    title: "Error",
+                                    text: "User not found!",
+                                    icon: "error"
+                                })
+                            }
+                            resetUserPassword(value)
+                                .then(() => {
+                                    Swal.fire({
+                                        title: "Sent!",
+                                        text: " A password reset email has been sent to your given email address!",
+                                        icon: "success"
+                                    })
+                                })
 
+                        })
 
 
 

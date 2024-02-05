@@ -20,7 +20,7 @@ const createToken = (req, res) => {
         if (user) {
             const refreshToken = createRefreshToken(user);
             const sessionToken = createSessionToken(user);
-            res.status(200).json({ sessionToken, refreshToken, expiresAt: 30 * 60 });
+            return res.status(200).json({ sessionToken, refreshToken, expiresAt: 30 * 60 });
         }
 
         res.send({ message: "No payload found!" });

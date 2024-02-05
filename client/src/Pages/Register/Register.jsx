@@ -11,6 +11,7 @@ import { sendEmailVerification, updateProfile } from "firebase/auth";
 import toast, { Toaster } from 'react-hot-toast';
 import Swal from "sweetalert2";
 import { RotatingLines } from 'react-loader-spinner';
+import useAxiosPublic from "../../hooks/useAxiosPublic";
 
 
 
@@ -24,6 +25,7 @@ const Register = () => {
     const [isRegistering, setIsRegistering] = useState(false);
 
     const { createUser } = useContext(UserContext);
+    const axiosPublic = useAxiosPublic();
 
 
     //Form submit
@@ -41,15 +43,22 @@ const Register = () => {
                             updateProfile(user, { displayName: data?.name || " ", photoURL: userPlaceholder })
                                 .then(() => {
                                     setIsRegistering(false);
-                                    Swal.fire({
-                                        title: " Verify Your Email!",
-                                        text: " A verification email has been sent to your email address. Please check your inbox and click on the verification link to complete the registration process.",
-                                        confirmButtonText: "Go to Login"
-                                    }).then(result => {
-                                        if (result.isConfirmed) {
-                                            navigate("/login", { replace: true });
-                                        }
-                                    });
+                                    //Save verified user to Database
+                                    axiosPublic.post("/user", { name: user?.displayName, email: user?.email })
+                                        .then(res => {
+                                            if (res.data) {
+                                                Swal.fire({
+                                                    title: " Verify Your Email!",
+                                                    text: " A verification email has been sent to your email address. Please check your inbox and click on the verification link to complete the registration process.",
+                                                    confirmButtonText: "Go to Login"
+                                                }).then(result => {
+                                                    if (result.isConfirmed) {
+                                                        navigate("/login", { replace: true });
+                                                    }
+                                                });
+                                            }
+                                        })
+
                                 });
                         });
                 }
