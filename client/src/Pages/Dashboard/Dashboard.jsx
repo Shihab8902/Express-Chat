@@ -1,16 +1,35 @@
-import { useContext } from "react"
-import { UserContext } from "../../Context/AuthProvider"
+
+import Desktop from "../../Layouts/Desktop";
+import Mobile from "../../Layouts/Mobile";
+
 
 const DashBoard = () => {
 
-    const { logOutUser } = useContext(UserContext);
-
-    return <button onClick={() => logOutUser()} className="btn-primary">Logout</button>
 
 
+    return <section className="container mx-auto ">
 
-    //TODO: 
-    //4. Add forget password link to login page
+        {/* For mobile screens */}
+        <div className="lg:hidden">
+            <Mobile />
+        </div>
+
+
+        {/* For desktop and laptop screens */}
+        <div className="hidden lg:block">
+            <Desktop />
+        </div>
+
+
+
+
+
+
+
+    </section>
+
+
+
 
 
 }
