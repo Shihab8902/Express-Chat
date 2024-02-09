@@ -7,7 +7,7 @@ const DashBoard = () => {
 
 
 
-    return <section className="container mx-auto ">
+    return <section >
 
         {/* For mobile screens */}
         <div className="lg:hidden">

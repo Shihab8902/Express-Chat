@@ -25,6 +25,7 @@ const Desktop = () => {
                 <TabPanel>
                     <Chats />
                 </TabPanel>
+
                 <TabPanel>
                     <Contacts />
                 </TabPanel>
