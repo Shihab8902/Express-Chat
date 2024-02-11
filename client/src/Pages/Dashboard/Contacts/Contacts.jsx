@@ -3,7 +3,8 @@ import { useContext, useState } from "react";
 import { UserContext } from "../../../Context/AuthProvider";
 import ContactAddingModal from "../../../Components/Modal/ContactAddingModal";
 import useGetSecure from "../../../hooks/useGetSecure";
-import { CiEdit } from "react-icons/ci";
+import ContactManageModal from "../../../Components/Modal/ContactManageModal";
+
 
 
 
@@ -11,6 +12,8 @@ import { CiEdit } from "react-icons/ci";
 const Contacts = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isContactManageModalOpen, setIsContactManageModalOpen] = useState(false);
+    const [currentlySelectedContact, setCurrentlySelectedContact] = useState({});
 
     const { user } = useContext(UserContext);
 
@@ -18,16 +21,13 @@ const Contacts = () => {
     //Fetch available contacts
     const { data: contacts, refetch, isPending } = useGetSecure([user?.email, "contact"], `/contact?email=${user?.email}`);
 
-    console.log(contacts);
 
-
-
-    //handle contact manage
-    const handleContactManage = (id) => {
-        console.log(id);
-        //TODO: 1. do edit and delete contact
-        //2. implement verify token
-        //3. set interceptor in axios secure
+    //Handle long press touch for mobile devices
+    const handleTouchStart = (contact) => {
+        setTimeout(() => {
+            setCurrentlySelectedContact(contact);
+            setIsContactManageModalOpen(!isContactManageModalOpen);
+        }, 300);
     }
 
 
@@ -61,32 +61,42 @@ const Contacts = () => {
 
         {/* Available Contacts */}
         {
-            isPending ? ""
+            isPending ? <div className="flex justify-center my-10 text-gray-500">
+                <span className="loading loading-dots loading-xs"></span>
+                <span className="loading loading-dots loading-sm"></span>
+                <span className="loading loading-dots loading-md"></span>
+                <span className="loading loading-dots loading-lg"></span>
+            </div>
                 : contacts?.length > 0 ? contacts?.map(contact => {
                     const { name, email, photo, _id } = contact;
 
-                    return <>
 
-                        <li onDoubleClick={() => handleContactManage(_id)} key={_id} className="list-none flex items-center mt-6 gap-3 shadow bg-gray-100 py-2 px-5 rounded-lg ">
-                            <img className="w-12 h-12 rounded-full" src={photo} alt="" />
-                            <div>
-                                <h3 className=" font-semibold">{name}</h3>
-                                <p className="font-medium text-sm text-gray-500">{email}</p>
-                            </div>
+                    return <li
+                        onDoubleClick={() => {
+                            setIsContactManageModalOpen(!isContactManageModalOpen);
+                            setCurrentlySelectedContact(contact);
+                        }}
+                        onTouchStart={() => handleTouchStart(contact)}
+                        key={_id}
+                        className="list-none flex items-center mt-6 gap-3 shadow bg-gray-100 py-2 px-5 rounded-lg ">
+                        <img className="w-12 h-12 rounded-full" src={photo} alt="" />
+                        <div>
+                            <h3 className=" font-semibold">{name}</h3>
+                            <p className="font-medium text-sm text-gray-500">{email}</p>
+                        </div>
+                    </li>
 
 
-                            {/* Action buttons */}
-                            <div>
-                                <button><CiEdit /></button>
-                            </div>
-                        </li>
 
-                    </>
+
                 })
-                    : ""
+                    : <div className="text-center my-20 text-gray-500 font-semibold text-2xl">
+                        <h3>No contacts were found!</h3>
+                    </div>
         }
 
-        <ContactAddingModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+        <ContactAddingModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} refetch={refetch} contacts={contacts} />
+        <ContactManageModal isModalOpen={isContactManageModalOpen} setIsModalOpen={setIsContactManageModalOpen} contact={currentlySelectedContact} refetch={refetch} />
 
     </div>
 }

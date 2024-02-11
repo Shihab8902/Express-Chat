@@ -8,8 +8,9 @@ import { RotatingLines } from 'react-loader-spinner';
 import { UserContext } from '../../Context/AuthProvider';
 import toast, { Toaster } from 'react-hot-toast';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
+import Swal from 'sweetalert2';
 
-const ContactAddingModal = ({ isModalOpen, setIsModalOpen }) => {
+const ContactAddingModal = ({ isModalOpen, setIsModalOpen, refetch, contacts }) => {
 
     const { user } = useContext(UserContext);
 
@@ -30,10 +31,20 @@ const ContactAddingModal = ({ isModalOpen, setIsModalOpen }) => {
             return toast.error("Cannot add a contact using own email address!");
         }
 
+
+        //Check for  duplicates
+        const isExist = contacts?.find(contact => contact.email === data.email);
+
+        if (isExist) {
+            setIsAdding(false);
+            return toast.error("This contact already exists!");
+        }
+
+
+
         //Send contact save request
         axiosSecure.post(`/contact?email=${user.email}`, data)
             .then(res => {
-
                 // Handle no user existence
                 if (res.data === "No user found!") {
                     setIsAdding(false);
@@ -53,10 +64,16 @@ const ContactAddingModal = ({ isModalOpen, setIsModalOpen }) => {
                     ));
                 }
 
-
                 //Refetch contact list after adding new one
-
+                refetch();
                 setIsAdding(false);
+                setIsModalOpen(!isModalOpen);
+                Swal.fire({
+                    text: "Contact successfully added!",
+                    showConfirmButton: false,
+                    icon: "success",
+                    timer: 1500
+                })
 
             })
             .catch(error => {
@@ -152,4 +169,12 @@ export default ContactAddingModal;
 ContactAddingModal.propTypes = {
     isModalOpen: PropTypes.bool,
     setIsModalOpen: PropTypes.func,
+    refetch: PropTypes.func,
+    contacts: PropTypes.arrayOf(PropTypes.shape({
+        _id: PropTypes.string,
+        name: PropTypes.string,
+        email: PropTypes.string,
+        photo: PropTypes.string,
+        recipientEmail: PropTypes.string
+    }))
 }
