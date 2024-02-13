@@ -4,6 +4,9 @@ import Home from '../Pages/Home/Home';
 import Register from '../Pages/Register/Register';
 import Login from '../Pages/Login/Login';
 import EmailVerification from '../Pages/Register/EmailVerification';
+import ChatField from '../Pages/Dashboard/Chats/ChatField';
+import DashBoard from '../Pages/Dashboard/Dashboard';
+import Desktop from '../Layouts/Desktop';
 
 export const router = createBrowserRouter([
     {
@@ -25,6 +28,16 @@ export const router = createBrowserRouter([
             {
                 path: "/emailVerification",
                 element: <EmailVerification />
+            },
+        ]
+    },
+    {
+        path: "/chat",
+        element: <Desktop />,
+        children: [
+            {
+                path: "/chat/:email",
+                element: <ChatField />
             }
         ]
     }

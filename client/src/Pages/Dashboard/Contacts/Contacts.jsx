@@ -4,6 +4,7 @@ import { UserContext } from "../../../Context/AuthProvider";
 import ContactAddingModal from "../../../Components/Modal/ContactAddingModal";
 import useGetSecure from "../../../hooks/useGetSecure";
 import ContactManageModal from "../../../Components/Modal/ContactManageModal";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -16,6 +17,8 @@ const Contacts = () => {
     const [currentlySelectedContact, setCurrentlySelectedContact] = useState({});
 
     const { user } = useContext(UserContext);
+
+    const navigate = useNavigate();
 
 
     //Fetch available contacts
@@ -77,9 +80,10 @@ const Contacts = () => {
                             setCurrentlySelectedContact(contact);
                         }}
                         onTouchStart={() => handleTouchStart(contact)}
+                        onClick={() => navigate(`/chat/${email}`)}
                         key={_id}
-                        className="list-none flex items-center mt-6 gap-3 shadow bg-gray-100 py-2 px-5 rounded-lg ">
-                        <img className="w-12 h-12 rounded-full" src={photo} alt="" />
+                        className="list-none flex items-center mt-6 gap-3 shadow bg-gray-100 py-2 px-5 rounded-lg cursor-pointer">
+                        <img className="w-12 h-12 rounded-full" src={photo} alt="user" />
                         <div>
                             <h3 className=" font-semibold">{name}</h3>
                             <p className="font-medium text-sm text-gray-500">{email}</p>

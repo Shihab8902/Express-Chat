@@ -17,7 +17,7 @@ const Mobile = () => {
 
         <Tabs>
             <TabList className="bg-green-600 flex justify-evenly items-center text-white font-semibold ">
-                <Tab className="border-none flex-1 text-center py-2 outline-none ">Chats</Tab>
+                <Tab className="border-none flex-1 text-center py-2 outline-none">Chats</Tab>
                 <Tab className="border-none flex-1 text-center py-2 outline-none">Contacts</Tab>
             </TabList>
 

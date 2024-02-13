@@ -16,14 +16,9 @@ const DashBoard = () => {
 
 
         {/* For desktop and laptop screens */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block ">
             <Desktop />
         </div>
-
-
-
-
-
 
 
     </section>
