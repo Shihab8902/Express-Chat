@@ -53,6 +53,33 @@ const AuthProvider = ({ children }) => {
     const axiosSecure = useAxiosSecure();
 
 
+    //Refresh token
+    useEffect(() => {
+        // Define the function to refresh the token
+        function refreshToken() {
+            const refreshToken = localStorage.getItem("refresh-token");
+            const expiresAt = JSON.parse(localStorage.getItem("expiresAt"));
+
+            if (expiresAt && refreshToken) {
+                const intervalId = setInterval(() => {
+                    axiosSecure.post("/refreshToken", { token: refreshToken })
+                        .then(res => {
+                            localStorage.setItem("session-token", res.data?.token)
+                        });
+                }, expiresAt * 1000 - 500 * 1000); // Refresh the token every approx 21 minutes
+
+                // Clean up the interval to avoid memory leaks
+                return () => clearInterval(intervalId);
+            }
+        }
+
+        // Call refreshToken function when the user is authenticated
+        if (user) {
+            refreshToken();
+        }
+    }, [user]);
+
+
     //User state observer
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, currentUser => {
@@ -85,25 +112,6 @@ const AuthProvider = ({ children }) => {
     }, []);
 
 
-    //Refresh token
-    useEffect(() => {
-        const refreshToken = localStorage.getItem("refresh-token");
-        const expiresAt = JSON.parse(localStorage.getItem("expiresAt"));
-
-        if (user) {
-            const refreshInterval = setInterval(() => {
-                axiosSecure.post("/refreshToken", { token: refreshToken })
-                    .then(res => {
-                        localStorage.setItem("session-token", res.data?.token)
-                    });
-            }, expiresAt * 1000 - 500 * 1000); //Refresh the token every approx 21 minute
-
-
-
-            return () => clearInterval(refreshInterval); //Clear interval after unmount
-        }
-
-    })
 
 
     const authInfo = {

@@ -9,11 +9,14 @@ import toast, { Toaster } from 'react-hot-toast';
 import { RotatingLines } from "react-loader-spinner";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 
 const ContactManageModal = ({ isModalOpen, setIsModalOpen, contact, refetch }) => {
 
     const { name, email, _id } = contact;
+
+    const navigate = useNavigate();
 
     const [isEdit, setIsEdit] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -87,6 +90,7 @@ const ContactManageModal = ({ isModalOpen, setIsModalOpen, contact, refetch }) =
                             });
                             refetch();
                             setIsModalOpen(!isModalOpen);
+                            navigate("/");
                         }
                     })
 

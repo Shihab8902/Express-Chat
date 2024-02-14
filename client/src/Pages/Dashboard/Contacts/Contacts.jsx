@@ -34,6 +34,12 @@ const Contacts = () => {
     }
 
 
+    //Handle conversation move
+    const handleConversationMove = (contact) => {
+
+    }
+
+
 
     return <div className="p-4 ">
 
@@ -80,7 +86,10 @@ const Contacts = () => {
                             setCurrentlySelectedContact(contact);
                         }}
                         onTouchStart={() => handleTouchStart(contact)}
-                        onClick={() => navigate(`/chat/${email}`)}
+                        onClick={() => {
+                            navigate(`/chat/${email}`, { state: contact });
+                            handleConversationMove(contact);
+                        }}
                         key={_id}
                         className="list-none flex items-center mt-6 gap-3 shadow bg-gray-100 py-2 px-5 rounded-lg cursor-pointer">
                         <img className="w-12 h-12 rounded-full" src={photo} alt="user" />
