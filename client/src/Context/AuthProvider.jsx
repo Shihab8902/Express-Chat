@@ -15,8 +15,6 @@ const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-
-
     //Create user
     const createUser = (email, password) => {
         setLoading(true);
@@ -77,7 +75,7 @@ const AuthProvider = ({ children }) => {
         if (user) {
             refreshToken();
         }
-    }, [user]);
+    });
 
 
     //User state observer

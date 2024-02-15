@@ -3,6 +3,7 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoIosSend } from "react-icons/io";
 import { useContext, useEffect } from "react";
+import { UserContext } from "../../../Context/AuthProvider";
 import { ConversationContext } from "../../../Context/ConversationProvider";
 
 
@@ -12,25 +13,30 @@ const ChatField = () => {
 
     const navigate = useNavigate();
 
+    const { user } = useContext(UserContext);
+
     //Get contact details
     const contact = useLocation().state;
     const { photo, name, email } = contact;
+    const { setSender, setReceiver, setOwnMessage, conversations, loading } = useContext(ConversationContext);
 
-    const { setReceiver, setOwnMessages } = useContext(ConversationContext);
-
+    //Set sender and receiver on initial component mount
     useEffect(() => {
+        setSender(user?.email);
         setReceiver(email);
-    }, []);
+    }, [user, contact]);
+
 
     const handleSubmit = e => {
         e.preventDefault();
-        setOwnMessages(e.target.messageInput.value);
+        const messageData = {
+            from: user?.email,
+            to: email,
+            content: e.target.messageInput.value,
+        }
+        setOwnMessage(messageData);
         e.target.reset();
     }
-
-    //Update the receiver on page render
-
-
 
 
     return <section className=" h-screen overflow-y-auto relative">
@@ -92,14 +98,21 @@ const ChatField = () => {
 
         {/* Message body */}
         <div>
-
+            {
+                loading ? "" :
+                    <div>
+                        {
+                            conversations?.map(message => <li key={message._id}>{message.content}</li>)
+                        }
+                    </div>
+            }
         </div>
 
         {/* Message input */}
         <div className="absolute bottom-0 left-0 w-full py-2 px-5 ">
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
                 <input className=" w-full border border-slate-600 px-5 py-2 font-semibold placeholder:font-normal rounded-full outline-none" type="text" name="messageInput" id="messageInput" placeholder="Compose Message" />
-                <button className=" p-3 rounded-full bg-green-600 text-xl text-white  "><IoIosSend /></button>
+                <button disabled={loading} className=" p-3 rounded-full bg-green-600 text-xl text-white  "><IoIosSend /></button>
             </form>
         </div>
 

@@ -8,9 +8,6 @@ const conversationSchema = new mongoose.Schema({
         type: String
     },
     messages: [{
-        messageId: {
-            type: String,
-        },
         from: {
             type: String
         },

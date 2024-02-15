@@ -1,12 +1,12 @@
 import { useContext } from "react"
 import { UserContext } from "../../Context/AuthProvider"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const ProfilePreview = () => {
 
     const { user, logOutUser } = useContext(UserContext);
-
+    const navigate = useNavigate();
 
     //Handle user logout
     const handleLogOut = () => {
@@ -21,6 +21,7 @@ const ProfilePreview = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 logOutUser();
+                navigate("/");
             }
         });
     }

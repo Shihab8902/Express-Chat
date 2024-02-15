@@ -4,9 +4,7 @@ const getConversation = async (req, res) => {
     try {
         const sender = req.query.sender;
         const receiver = req.query.receiver;
-
         const filter = { sender, receiver };
-
         const result = await conversationCollection.findOne(filter);
         res.send(result);
     }
