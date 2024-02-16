@@ -5,12 +5,12 @@ const postAndUpdateConversation = async (req, res) => {
     try {
         const sender = req.query.sender;
         const receiver = req.query.receiver;
-        const conversationId = req.query.id;
+        const senderConversation = await conversationCollection.findOne({ sender: sender, receiver: receiver });
+        const receiverConversation = await conversationCollection.findOne({ sender: receiver, receiver: sender });
         const data = req.body;
 
-
         //If a conversation id is provided from the client it will just update the previous conversation
-        if (conversationId) {
+        if (senderConversation && receiverConversation) {
             const filter = { sender, receiver };
             const swappedFilter = { sender: receiver, receiver: sender };
 
@@ -34,24 +34,25 @@ const postAndUpdateConversation = async (req, res) => {
 
             //Update the available conversation or create new conversation for the deleted user
             if (existingConversation) {
-                console.log("is there")
-                const newMessages = [...existingConversation.messages, ...messages];
+                const newMessages = [...existingConversation.messages, ...data];
                 await conversationCollection.updateOne({ sender: existingConversation.sender, receiver: existingConversation.receiver }, { messages: newMessages });
-                await conversationCollection.create({ sender: existingConversation.receiver, receiver: existingConversation.sender, messages: messages });
+                await conversationCollection.create({ sender: existingConversation.receiver, receiver: existingConversation.sender, messages: data });
                 return res.send("updated one!");
             } else {
                 //Create new data for the first time
-                await conversationCollection.create({
-                    sender,
-                    receiver,
-                    messages: data
-                });
+                if (sender && receiver) {
+                    await conversationCollection.create({
+                        sender,
+                        receiver,
+                        messages: data
+                    });
 
-                await conversationCollection.create({
-                    sender: receiver,
-                    receiver: sender,
-                    messages: data
-                });
+                    await conversationCollection.create({
+                        sender: receiver,
+                        receiver: sender,
+                        messages: data
+                    });
+                }
             }
 
             return res.send("Created new!");

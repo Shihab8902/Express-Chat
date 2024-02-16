@@ -18,7 +18,7 @@ const ChatField = () => {
     //Get contact details
     const contact = useLocation().state;
     const { photo, name, email } = contact;
-    const { setSender, setReceiver, setOwnMessage, conversations, loading } = useContext(ConversationContext);
+    const { setSender, setReceiver, setOwnMessage, conversations, loading, socket } = useContext(ConversationContext);
 
     //Set sender and receiver on initial component mount
     useEffect(() => {
@@ -32,17 +32,22 @@ const ChatField = () => {
         const messageData = {
             from: user?.email,
             to: email,
-            content: e.target.messageInput.value,
+            content: e.target.messageInput.value
         }
+        socket.current.emit("sendMessage", {
+            senderId: messageData.from,
+            receiverId: messageData.to,
+            message: messageData.content
+        });
         setOwnMessage(messageData);
         e.target.reset();
     }
 
 
-    return <section className=" h-screen overflow-y-auto relative">
+    return <section className=" h-screen overflow-hidden relative">
 
         {/* Upper section */}
-        <div className="w-full bg-green-600 sticky top-0  min-h-14  flex justify-between items-center px-5 py-4">
+        <div className="w-full bg-green-600 sticky top-0 z-20  min-h-14  flex justify-between items-center px-5 py-4">
 
             {/* Back button for mobile devices */}
             <div className="lg:hidden">
@@ -97,19 +102,53 @@ const ChatField = () => {
         </div>
 
         {/* Message body */}
-        <div>
+        <div className="overflow-y-auto border-2 h-full pb-40">
             {
                 loading ? "" :
-                    <div>
+                    <div className="flex overflow-y-auto h-full flex-col gap-4 w-full">
                         {
-                            conversations?.map(message => <li key={message._id}>{message.content}</li>)
+                            conversations?.map(message => {
+
+                                return <>
+                                    {
+                                        message.from === user.email ? <div className="chat chat-end">
+                                            <div className="chat-image avatar">
+                                                <div className="w-10 rounded-full">
+                                                    <img alt={user?.displayName} src={user?.photoURL} />
+                                                </div>
+                                            </div>
+                                            <div className="chat-bubble bg-green-500 text-white">{message.content}</div>
+                                            <div className="chat-footer text-xs opacity-60">
+                                                You
+                                            </div>
+                                        </div>
+                                            :
+
+                                            <div className="chat chat-start">
+                                                <div className="chat-image avatar">
+                                                    <div className="w-10 rounded-full">
+                                                        <img alt={name} src={photo} />
+                                                    </div>
+                                                </div>
+
+                                                <div className="chat-bubble  text-white">{message.content}</div>
+                                                <div className="chat-footer text-xs opacity-60">
+                                                    {name || email}
+                                                </div>
+                                            </div>
+
+                                    }
+
+                                </>
+
+                            })
                         }
                     </div>
             }
         </div>
 
         {/* Message input */}
-        <div className="absolute bottom-0 left-0 w-full py-2 px-5 ">
+        <div className="absolute mt-3  bg-white bottom-0 left-0 w-full py-2 px-5 ">
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
                 <input className=" w-full border border-slate-600 px-5 py-2 font-semibold placeholder:font-normal rounded-full outline-none" type="text" name="messageInput" id="messageInput" placeholder="Compose Message" />
                 <button disabled={loading} className=" p-3 rounded-full bg-green-600 text-xl text-white  "><IoIosSend /></button>
