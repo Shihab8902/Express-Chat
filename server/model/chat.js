@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const contactSchema = new mongoose.Schema({
+const chatSchema = new mongoose.Schema({
     name: {
         type: String,
         default: 'Unknown'
@@ -20,6 +20,6 @@ const contactSchema = new mongoose.Schema({
 });
 
 
-const contactCollection = mongoose.model('contacts', contactSchema);
+const chatCollection = mongoose.model('chats', chatSchema);
 
-module.exports = contactCollection;
+module.exports = chatCollection;

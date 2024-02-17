@@ -2,16 +2,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa6";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoIosSend } from "react-icons/io";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { UserContext } from "../../../Context/AuthProvider";
 import { ConversationContext } from "../../../Context/ConversationProvider";
-
-
 
 
 const ChatField = () => {
 
     const navigate = useNavigate();
+
+    const scrollRef = useRef();
 
     const { user } = useContext(UserContext);
 
@@ -44,7 +44,12 @@ const ChatField = () => {
     }
 
 
-    return <section className=" h-screen overflow-hidden relative">
+    useEffect(() => {
+        scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [conversations])
+
+
+    return <section className=" h-screen overflow-hidden flex flex-col">
 
         {/* Upper section */}
         <div className="w-full bg-green-600 sticky top-0 z-20  min-h-14  flex justify-between items-center px-5 py-4">
@@ -102,17 +107,22 @@ const ChatField = () => {
         </div>
 
         {/* Message body */}
-        <div className="overflow-y-auto border-2 h-full pb-40">
+        <div className="overflow-y-auto  h-full ">
             {
-                loading ? "" :
-                    <div className="flex overflow-y-auto h-full flex-col gap-4 w-full">
+                loading ? <div className="flex h-full justify-center items-center text-gray-500">
+                    <span className="loading loading-dots loading-xs"></span>
+                    <span className="loading loading-dots loading-sm"></span>
+                    <span className="loading loading-dots loading-md"></span>
+                    <span className="loading loading-dots loading-lg"></span>
+                </div> :
+                    <div className="flex overflow-y-auto h-full flex-col gap-4 w-full px-3 lg:px-5">
                         {
                             conversations?.map(message => {
 
                                 return <>
                                     {
                                         message.from === user.email ? <div className="chat chat-end">
-                                            <div className="chat-image avatar">
+                                            <div ref={scrollRef} key={message._id} className="chat-image avatar">
                                                 <div className="w-10 rounded-full">
                                                     <img alt={user?.displayName} src={user?.photoURL} />
                                                 </div>
@@ -124,7 +134,7 @@ const ChatField = () => {
                                         </div>
                                             :
 
-                                            <div className="chat chat-start">
+                                            <div ref={scrollRef} key={message._id} className="chat chat-start">
                                                 <div className="chat-image avatar">
                                                     <div className="w-10 rounded-full">
                                                         <img alt={name} src={photo} />
@@ -148,7 +158,7 @@ const ChatField = () => {
         </div>
 
         {/* Message input */}
-        <div className="absolute mt-3  bg-white bottom-0 left-0 w-full py-2 px-5 ">
+        <div className=" bg-white justify-end items-end  w-full py-2 px-5 ">
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
                 <input className=" w-full border border-slate-600 px-5 py-2 font-semibold placeholder:font-normal rounded-full outline-none" type="text" name="messageInput" id="messageInput" placeholder="Compose Message" />
                 <button disabled={loading} className=" p-3 rounded-full bg-green-600 text-xl text-white  "><IoIosSend /></button>

@@ -5,6 +5,7 @@ import ContactAddingModal from "../../../Components/Modal/ContactAddingModal";
 import useGetSecure from "../../../hooks/useGetSecure";
 import ContactManageModal from "../../../Components/Modal/ContactManageModal";
 import { useNavigate } from "react-router-dom";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 
 
@@ -19,6 +20,7 @@ const Contacts = () => {
     const { user } = useContext(UserContext);
 
     const navigate = useNavigate();
+    const axiosSecure = useAxiosSecure();
 
 
     //Fetch available contacts
@@ -36,6 +38,14 @@ const Contacts = () => {
 
     //Handle conversation move
     const handleConversationMove = (contact) => {
+        const contactInfo = {
+            name: contact.name,
+            email: contact.email,
+            photo: contact.photo,
+            recipientEmail: user.email
+        }
+
+        axiosSecure.post(`/chat?user=${user.email}`, contactInfo);
 
     }
 
