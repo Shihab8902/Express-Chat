@@ -68,10 +68,13 @@ const ConversationProvider = ({ children }) => {
     //Send user email
     useEffect(() => {
         socket.current?.emit("addUser", user?.email || '');
-        socket.current?.on("getUsers", () => {
+        // socket.current?.on("getUsers", (users) => {
 
-        })
+        // })
+
     }, [user]);
+
+
 
 
 
@@ -81,7 +84,7 @@ const ConversationProvider = ({ children }) => {
         loading,
         conversations,
         setOwnMessage,
-        socket
+        socket,
     }
 
 

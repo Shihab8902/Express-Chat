@@ -1,10 +1,13 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa6";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { HiOutlineStatusOnline } from "react-icons/hi";
 import { IoIosSend } from "react-icons/io";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { UserContext } from "../../../Context/AuthProvider";
+import "./chatField.css";
 import { ConversationContext } from "../../../Context/ConversationProvider";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+
 
 
 const ChatField = () => {
@@ -12,8 +15,12 @@ const ChatField = () => {
     const navigate = useNavigate();
 
     const scrollRef = useRef();
+    const textAreaRef = useRef();
 
     const { user } = useContext(UserContext);
+    const [message, setMessage] = useState('');
+    const axiosSecure = useAxiosSecure();
+
 
     //Get contact details
     const contact = useLocation().state;
@@ -32,7 +39,7 @@ const ChatField = () => {
         const messageData = {
             from: user?.email,
             to: email,
-            content: e.target.messageInput.value
+            content: message
         }
         socket.current.emit("sendMessage", {
             senderId: messageData.from,
@@ -40,13 +47,39 @@ const ChatField = () => {
             message: messageData.content
         });
         setOwnMessage(messageData);
-        e.target.reset();
+        setMessage('');
+
+        //Set the contact to another person message request
+        if (!conversations) {
+            const messageRequestData = {
+                name: user.displayName,
+                email: user.email,
+                photo: user.photoURL,
+                recipientEmail: email
+            }
+
+            axiosSecure.post("/messageRequest", messageRequestData);
+        }
     }
 
 
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [conversations])
+
+
+
+    //Handle text area height
+    const handleTextAreaHeight = () => {
+        const textarea = textAreaRef.current;
+        if (textarea) {
+            textarea.style.height = "50px";
+            textarea.style.height = `${textarea.scrollHeight}px`;
+            textarea.scrollTop = textarea.scrollHeight;
+        }
+    };
+
+
 
 
     return <section className=" h-screen overflow-hidden flex flex-col">
@@ -56,7 +89,7 @@ const ChatField = () => {
 
             {/* Back button for mobile devices */}
             <div className="lg:hidden">
-                <button onClick={() => navigate(-1)} className="text-white text-xl"><FaArrowLeft /></button>
+                <button onClick={() => navigate("/")} className="text-white text-xl"><FaArrowLeft /></button>
             </div>
 
             {/* Contact details */}
@@ -85,22 +118,10 @@ const ChatField = () => {
 
             </div>
 
-            {/* Three dot menu */}
-            <div className="dropdown dropdown-end">
-                <div tabIndex={0} role="button" >
-                    <div className="indicator">
-                        <button className="text-xl text-white"><BsThreeDotsVertical /></button>
-                    </div>
-                </div>
-                <div tabIndex={0} className="mt-3 z-[1] card card-compact dropdown-content w-52 bg-base-100 shadow">
-                    <div className="card-body">
-                        <span className="font-bold text-lg">8 Items</span>
-                        <span className="text-info">Subtotal: $999</span>
-                        <div className="card-actions">
-                            <button className="btn btn-primary btn-block">View cart</button>
-                        </div>
-                    </div>
-                </div>
+
+            {/* Active status */}
+            <div>
+                <span className="flex items-center gap-1 text-sm  text-white font-medium "><HiOutlineStatusOnline className="text-xl md:text-lg " /> </span>
             </div>
 
 
@@ -115,7 +136,7 @@ const ChatField = () => {
                     <span className="loading loading-dots loading-md"></span>
                     <span className="loading loading-dots loading-lg"></span>
                 </div> :
-                    <div className="flex overflow-y-auto h-full flex-col gap-4 w-full px-3 lg:px-5">
+                    <div className="flex overflow-y-auto h-full flex-col gap-4 w-full px-3 pt-4 lg:px-5">
                         {
                             conversations?.map(message => {
 
@@ -159,14 +180,22 @@ const ChatField = () => {
 
         {/* Message input */}
         <div className=" bg-white justify-end items-end  w-full py-2 px-5 ">
-            <form onSubmit={handleSubmit} className="flex items-center gap-2">
-                <input className=" w-full border border-slate-600 px-5 py-2 font-semibold placeholder:font-normal rounded-full outline-none" type="text" name="messageInput" id="messageInput" placeholder="Compose Message" />
-                <button disabled={loading} className=" p-3 rounded-full bg-green-600 text-xl text-white  "><IoIosSend /></button>
+            <form onSubmit={handleSubmit} className="flex items-center gap-2  ">
+                <textarea
+                    className="w-full outline-none border-2 hide-scrollbar py-2 px-4 focus:border-green-600 rounded-2xl focus:border resize-none max-h-32 overflow-auto"
+                    onChange={(e) => {
+                        setMessage(e.target.value);
+                        handleTextAreaHeight()
+                    }}
+                    ref={textAreaRef}
+                    style={{ height: '50px' }}
+                    value={message}
+                    name="messageInput"
+                    id="messageInput"
+                    placeholder="Compose Message" />
+                <button disabled={!message} className=" p-3 rounded-full bg-green-600 text-xl text-white  "><IoIosSend /></button>
             </form>
         </div>
-
-
-
 
 
     </section>
