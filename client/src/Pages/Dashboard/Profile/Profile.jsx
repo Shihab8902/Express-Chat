@@ -133,13 +133,15 @@ const Profile = () => {
         <div className="bg-white h-fit w-fit p-16 rounded-lg relative ">
 
             {/* image container */}
-            <div className="relative">
+            <div className="relative w-fit mx-auto">
                 {
                     isImageUpdating ? <img className="w-20 h-20 rounded-full mx-auto" src="https://i.ibb.co/tm2yWnf/updating.gif" alt="user" />
                         :
                         <img className="w-20 h-20 rounded-full mx-auto" src={photo || user?.photoURL} alt="user" />
                 }
-                <button className="absolute bottom-0 right-10 bg-green-600 text-white p-4 rounded-full text-lg w-6 h-6 flex items-center justify-center cursor-pointer">+ <input onChange={handleImageChange} type="file" className="absolute opacity-0 bottom-0 right-3 cursor-pointer " /></button>
+                <button className="absolute bottom-0 right-0 bg-green-600 text-white p-4 rounded-full text-lg w-6 h-6 flex items-center justify-center cursor-pointer">
+                    + <input onChange={handleImageChange} type="file" accept="image/*" className="absolute opacity-0 bottom-0 right-0 cursor-pointer " />
+                </button>
             </div>
 
             {/* Active status */}
@@ -155,7 +157,7 @@ const Profile = () => {
 
             {/* Email */}
             <div>
-                <h4 className="font-medium text-gray-600">{user?.email}</h4>
+                <h4 className="font-medium text-gray-600 text-center">{user?.email}</h4>
             </div>
 
 

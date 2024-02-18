@@ -52,22 +52,20 @@ const AuthProvider = ({ children }) => {
 
 
     //Refresh token
-    useEffect(() => {
-        const refreshToken = localStorage.getItem("refresh-token");
-        const expiresAt = JSON.parse(localStorage.getItem("expiresAt"));
 
-        if (expiresAt && refreshToken) {
-            const intervalId = setInterval(() => {
-                axiosSecure.post("/refreshToken", { token: refreshToken })
-                    .then(res => {
-                        localStorage.setItem("session-token", res.data?.token)
-                    });
-            }, expiresAt * 1000 - 500 * 1000); // Refresh the token every approx 21 minutes
+    const refreshToken = localStorage.getItem("refresh-token");
+    const expiresAt = JSON.parse(localStorage.getItem("expiresAt"));
 
-            // Clean up the interval to avoid memory leaks
-            return () => clearInterval(intervalId);
-        }
-    });
+    if (expiresAt && refreshToken) {
+        setInterval(() => {
+            axiosSecure.post("/refreshToken", { token: refreshToken })
+                .then(res => {
+                    localStorage.setItem("session-token", res.data?.token)
+                });
+        }, expiresAt * 1000 - 500 * 1000); // Refresh the token every approx 21 minutes
+
+    }
+
 
 
     //User state observer
