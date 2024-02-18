@@ -6,6 +6,7 @@ import Login from '../Pages/Login/Login';
 import EmailVerification from '../Pages/Register/EmailVerification';
 import ChatField from '../Pages/Dashboard/Chats/ChatField';
 import Desktop from '../Layouts/Desktop';
+import Profile from '../Pages/Dashboard/Profile/Profile';
 
 export const router = createBrowserRouter([
     {
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
                 path: "/emailVerification",
                 element: <EmailVerification />
             },
+            {
+                path: "/profile",
+                element: <Profile />
+            }
         ]
     },
     {

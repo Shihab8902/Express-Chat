@@ -40,7 +40,7 @@ const Register = () => {
                 if (user) {
                     sendEmailVerification(user)
                         .then(() => {
-                            updateProfile(user, { displayName: data?.name || " ", photoURL: userPlaceholder })
+                            updateProfile(user, { displayName: data?.name || "Unknown", photoURL: userPlaceholder })
                                 .then(() => {
                                     setIsRegistering(false);
                                     //Save verified user to Database
