@@ -14,6 +14,7 @@ const AuthProvider = ({ children }) => {
     //States
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [preLoaderLoading, setPreLoaderLoading] = useState(true);
 
     //Create user
     const createUser = (email, password) => {
@@ -51,8 +52,8 @@ const AuthProvider = ({ children }) => {
     const axiosSecure = useAxiosSecure();
 
 
-    //Refresh token
 
+    //Refresh token
     const refreshToken = localStorage.getItem("refresh-token");
     const expiresAt = JSON.parse(localStorage.getItem("expiresAt"));
 
@@ -68,8 +69,14 @@ const AuthProvider = ({ children }) => {
 
 
 
+
     //User state observer
     useEffect(() => {
+        //Set preloader false
+        const preloaderTimer = setTimeout(() => {
+            setPreLoaderLoading(false);
+        }, 5000);
+
         const unsubscribe = onAuthStateChanged(auth, currentUser => {
 
             if (currentUser && currentUser?.emailVerified) {
@@ -82,6 +89,7 @@ const AuthProvider = ({ children }) => {
                             localStorage.setItem("expiresAt", JSON.stringify(data?.expiresAt));
                             setUser(currentUser);
                             setLoading(false);
+                            setPreLoaderLoading(false);
                         }
                     });
 
@@ -94,6 +102,7 @@ const AuthProvider = ({ children }) => {
 
 
         return () => {
+            clearTimeout(preloaderTimer);
             unsubscribe();
         };
 
@@ -105,6 +114,7 @@ const AuthProvider = ({ children }) => {
     const authInfo = {
         user,
         loading,
+        preLoaderLoading,
         createUser,
         loginUser,
         logOutUser,
