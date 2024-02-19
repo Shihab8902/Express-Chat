@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { useContext } from 'react';
+import { UserContext } from '../Context/AuthProvider';
+
 
 export const axiosSecure = axios.create({
     baseURL: "http://localhost:9000",
@@ -6,6 +9,10 @@ export const axiosSecure = axios.create({
 });
 
 const useAxiosSecure = () => {
+
+
+
+    const context = useContext(UserContext);
     const token = localStorage.getItem("session-token");
 
     // Add a request interceptor
@@ -21,7 +28,10 @@ const useAxiosSecure = () => {
     axiosSecure.interceptors.response.use(function (response) {
         return response;
     }, function (error) {
-        console.log(error);
+        if (error.status === 401 || error.status === 403) {
+            context?.logOutUser();
+            window.location.reload();
+        }
         return Promise.reject(error);
     });
 

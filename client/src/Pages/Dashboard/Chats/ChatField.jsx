@@ -140,10 +140,10 @@ const ChatField = () => {
                         {
                             conversations?.map(message => {
 
-                                return <>
+                                return <section key={message._id}>
                                     {
                                         message.from === user.email ? <div className="chat chat-end">
-                                            <div ref={scrollRef} key={message._id} className="chat-image avatar">
+                                            <div ref={scrollRef} className="chat-image avatar">
                                                 <div className="w-10 rounded-full">
                                                     <img alt={user?.displayName} src={user?.photoURL} />
                                                 </div>
@@ -155,7 +155,7 @@ const ChatField = () => {
                                         </div>
                                             :
 
-                                            <div ref={scrollRef} key={message._id} className="chat chat-start">
+                                            <div ref={scrollRef} className="chat chat-start">
                                                 <div className="chat-image avatar">
                                                     <div className="w-10 rounded-full">
                                                         <img alt={name} src={photo} />
@@ -170,7 +170,7 @@ const ChatField = () => {
 
                                     }
 
-                                </>
+                                </section>
 
                             })
                         }
