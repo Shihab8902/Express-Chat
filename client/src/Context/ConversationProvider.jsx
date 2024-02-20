@@ -13,7 +13,7 @@ const ConversationProvider = ({ children }) => {
     const [sender, setSender] = useState('');
     const [loading, setLoading] = useState(true);
     const [conversations, setConversations] = useState([]);
-    const socket = useRef(io("ws://localhost:5000"));
+    const socket = useRef(io("wss://express-chat-socket-server.glitch.me"));
 
 
     //Fetch data on first render
@@ -47,7 +47,7 @@ const ConversationProvider = ({ children }) => {
 
 
     useEffect(() => {
-        socket.current = io("ws://localhost:5000");
+        socket.current = io("wss://express-chat-socket-server.glitch.me");
     }, []);
 
 
@@ -85,6 +85,7 @@ const ConversationProvider = ({ children }) => {
         conversations,
         setOwnMessage,
         socket,
+        setConversations
     }
 
 

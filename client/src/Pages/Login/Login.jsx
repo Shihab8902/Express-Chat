@@ -40,6 +40,7 @@ const Login = () => {
 
                 setIsLogging(false);
                 navigate("/");
+                window.location.reload();
 
             })
             .catch(error => {

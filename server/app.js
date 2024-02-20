@@ -16,14 +16,6 @@ useRoutes(app);
 
 
 
-
-
-
-
-
-
-
-
 //Home route
 app.get("/", (req, res) => {
     res.json({ message: "The server is up and running...." });

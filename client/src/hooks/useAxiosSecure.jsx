@@ -4,7 +4,7 @@ import { UserContext } from '../Context/AuthProvider';
 
 
 export const axiosSecure = axios.create({
-    baseURL: "http://localhost:9000",
+    baseURL: "https://express-chat-server.vercel.app",
 
 });
 
@@ -13,12 +13,15 @@ const useAxiosSecure = () => {
 
 
     const context = useContext(UserContext);
-    const token = localStorage.getItem("session-token");
+
 
     // Add a request interceptor
     axiosSecure.interceptors.request.use(function (config) {
-        config.headers.authorization = `bearer ${token}`;
-        return config;
+        const token = localStorage.getItem("session-token");
+        if (token) {
+            config.headers.authorization = `bearer ${token}`;
+            return config;
+        }
     }, function (error) {
         // Do something with request error
         return Promise.reject(error);

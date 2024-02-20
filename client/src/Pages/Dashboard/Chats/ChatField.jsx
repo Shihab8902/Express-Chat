@@ -140,6 +140,7 @@ const ChatField = () => {
                         {
                             conversations?.map(message => {
 
+
                                 return <section key={message._id}>
                                     {
                                         message.from === user.email ? <div className="chat chat-end">
@@ -148,7 +149,7 @@ const ChatField = () => {
                                                     <img alt={user?.displayName} src={user?.photoURL} />
                                                 </div>
                                             </div>
-                                            <div className="chat-bubble bg-green-500 text-white">{message.content}</div>
+                                            <div className="chat-bubble bg-green-500 text-white block break-words">{message.content}</div>
                                             <div className="chat-footer text-xs opacity-60">
                                                 You
                                             </div>
@@ -162,7 +163,7 @@ const ChatField = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="chat-bubble  text-white">{message.content}</div>
+                                                <div className="chat-bubble  text-white break-words">{message.content}</div>
                                                 <div className="chat-footer text-xs opacity-60">
                                                     {name || email}
                                                 </div>

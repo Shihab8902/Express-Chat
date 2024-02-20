@@ -4,6 +4,8 @@ import { CiTrash } from "react-icons/ci";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { ConversationContext } from "../../Context/ConversationProvider";
 
 
 const ChatManageModal = ({ isModalOpen, setIsModalOpen, chatData, refetch }) => {
@@ -13,6 +15,10 @@ const ChatManageModal = ({ isModalOpen, setIsModalOpen, chatData, refetch }) => 
 
     const { id, sender, receiver } = chatData;
 
+    const { setConversations } = useContext(ConversationContext);
+
+
+    //Conversation delete
     const handleConversationDelete = () => {
         Swal.fire({
             title: "Are you sure?",
@@ -37,7 +43,9 @@ const ChatManageModal = ({ isModalOpen, setIsModalOpen, chatData, refetch }) => 
                                 });
                                 navigate("/");
                                 refetch();
+                                setConversations([]);
                                 setIsModalOpen(!isModalOpen);
+
                             }
                         });
                 }
